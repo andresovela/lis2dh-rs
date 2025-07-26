@@ -182,10 +182,9 @@ where
     /// Care must be taken to ensure that this function does not read more data than
     /// the FIFO has available. This function provides no protection against that
     pub async fn read_data(&mut self, data: &mut [AccelerationData]) -> Result<(), Error<E>> {
-        for i in 0..data.len() {
-            self.read_from_fifo(&mut data[i]).await?;
+        for sample in data {
+            self.read_from_fifo(sample).await?;
         }
-
         Ok(())
     }
 
