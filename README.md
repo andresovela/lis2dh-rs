@@ -25,6 +25,15 @@ loop {
 }
 ```
 
+# Resources
+
+- [Product Page]
+- [Datasheet]
+- [Application Note]
+
 [LIS2DH12]: https://www.st.com/en/mems-and-sensors/lis2dh12.html
 [embedded-hal]: https://docs.rs/embedded-hal/latest/embedded_hal/
 [embedded-hal-async]: https://docs.rs/embedded-hal-async/latest/embedded_hal_async/
+[Datasheet]: https://www.st.com/resource/en/datasheet/lis2dh12.pdf
+[Product Page]: https://www.st.com/en/mems-and-sensors/lis2dh12.html
+[Application Note]: https://www.st.com/resource/en/application_note/an5005-lis2dh12-ultralowpower-highperformance-3axis-nano-accelerometer-with-digital-output-stmicroelectronics.pdf
