@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "lis2dh12"
+name = "lis2dh"
 version = "0.1.0"
 dependencies = [
  "embedded-hal",
