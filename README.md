@@ -3,7 +3,7 @@
 Driver crate for the ST [LIS2DH12] accelerometer.
 Compatible with [embedded-hal] and [embedded-hal-async] traits.
 
-# Example usage
+## Example usage
 
 ```rust
 let mut accelerometer = Lis2dh::new(i2c, Sa0Pad::High);
@@ -25,15 +25,23 @@ loop {
 }
 ```
 
-# Resources
+## Resources
 
-- [Product Page]
 - [Datasheet]
 - [Application Note]
+
+## License
+
+This work is licensed under either of
+
+- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or
+  <http://www.apache.org/licenses/LICENSE-2.0>)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
+
+at your option.
 
 [LIS2DH12]: https://www.st.com/en/mems-and-sensors/lis2dh12.html
 [embedded-hal]: https://docs.rs/embedded-hal/latest/embedded_hal/
 [embedded-hal-async]: https://docs.rs/embedded-hal-async/latest/embedded_hal_async/
 [Datasheet]: https://www.st.com/resource/en/datasheet/lis2dh12.pdf
-[Product Page]: https://www.st.com/en/mems-and-sensors/lis2dh12.html
 [Application Note]: https://www.st.com/resource/en/application_note/an5005-lis2dh12-ultralowpower-highperformance-3axis-nano-accelerometer-with-digital-output-stmicroelectronics.pdf
