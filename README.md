@@ -27,7 +27,6 @@ loop {
 
 ## Resources
 
-- [Product Page](LIS2DH12)
 - [Datasheet]
 - [Application Note]
 
