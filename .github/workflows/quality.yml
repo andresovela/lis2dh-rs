@@ -58,4 +58,4 @@ jobs:
         with:
           lfs: true
       - uses: dtolnay/rust-toolchain@stable
-      - run: RUSTDOCFLAGS="-D warnings" cargo doc --locked --document-private-items --all-features --workspace --exclude test-runner
+      - run: RUSTDOCFLAGS="-D warnings" cargo doc --locked --document-private-items --all-features
