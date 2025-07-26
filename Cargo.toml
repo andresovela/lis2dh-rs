@@ -1,6 +1,6 @@
 [package]
 name = "lis2dh"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 description = "Driver crate for the ST LIS2DH12 accelerometer"
 repository = "https://github.com/andresovela/lis2dh-rs"
