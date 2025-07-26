@@ -25,4 +25,5 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - run: rustup target add thumbv7m-none-eabi
-      - run: cargo check --locked --target thumbv7m-none-eabi --no-default-features
+      - run: cargo check --locked --target thumbv7m-none-eabi
+      - run: cargo check --locked --target thumbv7m-none-eabi --features async
