@@ -8,7 +8,7 @@ documentation = "https://docs.rs/lis2dh"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 keywords = ["accelerometer", "driver", "i2c"]
-categories = ["embedded", "no-std", "drivers", "asynchronous"]
+categories = ["embedded", "no-std"]
 exclude = [".github"]
 
 [dependencies]
