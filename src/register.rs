@@ -55,20 +55,20 @@ impl Register {
     pub fn is_read_only(self) -> bool {
         matches!(
             self,
-            Register::StatusRegAux |
-            Register::OutTempL |
-            Register::OutTempH |
-            Register::WhoAmI |
-            Register::OutXL |
-            Register::OutXH |
-            Register::OutYL |
-            Register::OutYH |
-            Register::OutZL |
-            Register::OutZH |
-            Register::FifoSrcReg |
-            Register::Int1Src |
-            Register::Int2Src |
-            Register::ClickSrc
+            Register::StatusRegAux
+                | Register::OutTempL
+                | Register::OutTempH
+                | Register::WhoAmI
+                | Register::OutXL
+                | Register::OutXH
+                | Register::OutYL
+                | Register::OutYH
+                | Register::OutZL
+                | Register::OutZH
+                | Register::FifoSrcReg
+                | Register::Int1Src
+                | Register::Int2Src
+                | Register::ClickSrc
         )
     }
 }

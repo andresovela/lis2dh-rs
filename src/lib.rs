@@ -1,19 +1,19 @@
 //! Driver crate for the ST [LIS2DH12] accelerometer.
 //! Compatible with [embedded-hal] and [embedded-hal-async] traits.
-//! 
+//!
 //! # Example usage
 //! ```ignore
 //! let mut accelerometer = Lis2dh::new(i2c, Sa0Pad::High);
 //!
 //! accelerometer.set_mode(Mode::Normal).await.unwrap();
 //! accelerometer.set_output_data_rate(OutputDataRate::Hz100).await.unwrap();
-//! 
+//!
 //! let int1_config = Int1Config::FifoWatermark;
 //! accelerometer.configure_int1(&int1_config).await.unwrap();
-//! 
+//!
 //! accelerometer.configure_fifo(FifoConfig::Stream { watermark: 9 }).await.unwrap();
 //! accelerometer.enable_fifo(true).await.unwrap();
-//! 
+//!
 //! let mut data = [AccelerationData::default(); 10];
 //! loop {
 //!     // Wait until the accelerometer fills the FIFO
@@ -21,7 +21,7 @@
 //!     accelerometer.read_data(&mut data).await.unwrap();
 //! }
 //! ```
-//! 
+//!
 //! [LIS2DH12]: https://www.st.com/en/mems-and-sensors/lis2dh12.html
 //! [embedded-hal]: https://docs.rs/embedded-hal/latest/embedded_hal/
 //! [embedded-hal-async]: https://docs.rs/embedded-hal-async/latest/embedded_hal_async/
@@ -54,16 +54,13 @@ where
     I2C: embedded_hal_async::i2c::I2c + embedded_hal::i2c::ErrorType<Error = E>,
 {
     /// Creates a new driver instance for the LIS2DH
-    /// 
+    ///
     /// The device's I2C address is dependent on how the
     /// SA0 pad of the device is connected on the board
     pub fn new(i2c: I2C, addr_pad: Sa0Pad) -> Self {
         let addr = 0x18 | addr_pad as u8;
 
-        Self {
-            i2c,
-            addr,
-        }
+        Self { i2c, addr }
     }
 
     /// Reads the accelerometer's  device ID
@@ -83,29 +80,31 @@ where
             Mode::LowPower => {
                 self.set_register_bits(Register::CtrlReg1, LPEN).await?;
                 self.clear_register_bits(Register::CtrlReg4, HR).await?;
-            },
+            }
             Mode::Normal => {
                 self.clear_register_bits(Register::CtrlReg1, LPEN).await?;
                 self.clear_register_bits(Register::CtrlReg4, HR).await?;
-            },
+            }
             Mode::HighResolution => {
                 self.clear_register_bits(Register::CtrlReg1, LPEN).await?;
                 self.set_register_bits(Register::CtrlReg4, HR).await?;
-            },
+            }
         };
         Ok(())
     }
 
     /// Sets the accelerometer's full scale
     pub async fn set_full_scale(&mut self, fs: FullScale) -> Result<(), Error<E>> {
-        self.clear_register_bits(Register::CtrlReg4, FS_MASK).await?;
+        self.clear_register_bits(Register::CtrlReg4, FS_MASK)
+            .await?;
         self.set_register_bits(Register::CtrlReg4, fs as u8).await
     }
 
     /// Sets the output data rate (ODR) of the accelerometer
     /// The ODR determines how often the accelerometer updates its readings
     pub async fn set_output_data_rate(&mut self, odr: OutputDataRate) -> Result<(), Error<E>> {
-        self.modify_register(Register::CtrlReg1, |v| (v & !ODR_MASK) | odr as u8).await?;
+        self.modify_register(Register::CtrlReg1, |v| (v & !ODR_MASK) | odr as u8)
+            .await?;
 
         // From the datasheet:
         // By design, when the device from high-resolution configuration (HR) is set to power-down
@@ -139,7 +138,7 @@ where
     }
 
     /// Enables/disables the accelerometer's FIFO
-    pub async fn enable_fifo(&mut self, enable:  bool) -> Result<(), Error<E>> {
+    pub async fn enable_fifo(&mut self, enable: bool) -> Result<(), Error<E>> {
         if enable {
             self.set_register_bits(Register::CtrlReg5, FIFO_EN).await
         } else {
@@ -152,12 +151,10 @@ where
         let value = match config {
             FifoConfig::Bypass => 0x00,
             FifoConfig::Fifo => 0x40,
-            FifoConfig::StreamToFifo { pin } => {
-                match pin {
-                    IntPin::Int1 => 0xC0,
-                    IntPin::Int2 => 0xE0,
-                }
-            }
+            FifoConfig::StreamToFifo { pin } => match pin {
+                IntPin::Int1 => 0xC0,
+                IntPin::Int2 => 0xE0,
+            },
             FifoConfig::Stream { watermark } => {
                 if watermark >= 0x20 {
                     return Err(Error::InvalidParameter);
@@ -181,7 +178,7 @@ where
     }
 
     /// Reads samples from the accelerometer's FIFO into the given array of data
-    /// 
+    ///
     /// Care must be taken to ensure that this function does not read more data than
     /// the FIFO has available. This function provides no protection against that
     pub async fn read_data(&mut self, data: &mut [AccelerationData]) -> Result<(), Error<E>> {
@@ -201,12 +198,15 @@ where
         // allow multiple data read/writes.
         let reg_addr = Register::OutXL as u8 | 0x80;
         let mut buffer = [0; 6];
-        self.i2c.write_read(self.addr, &[reg_addr], &mut buffer).await.map_err(Error::I2c)?;
+        self.i2c
+            .write_read(self.addr, &[reg_addr], &mut buffer)
+            .await
+            .map_err(Error::I2c)?;
 
         sample.x = i16::from_le_bytes([buffer[0], buffer[1]]);
         sample.y = i16::from_le_bytes([buffer[2], buffer[3]]);
         sample.z = i16::from_le_bytes([buffer[4], buffer[5]]);
-    
+
         Ok(())
     }
 
@@ -238,13 +238,14 @@ where
                 self.write_register(Register::CtrlReg3, I1_OVERRUN).await?;
             }
         }
-        
+
         Ok(())
     }
 
     /// Configures the functionality of pin INT2
     pub async fn configure_int2(&mut self, config: &Int2Config) -> Result<(), Error<E>> {
-        self.clear_register_bits(Register::CtrlReg6, I2_MASK).await?;
+        self.clear_register_bits(Register::CtrlReg6, I2_MASK)
+            .await?;
         match config {
             Int2Config::Unused => {
                 self.set_register_bits(Register::CtrlReg6, 0x00).await?;
@@ -269,7 +270,7 @@ where
                 self.set_register_bits(Register::CtrlReg6, I2_ACT).await?;
             }
         }
-        
+
         Ok(())
     }
 
@@ -277,20 +278,26 @@ where
     pub async fn set_interrupt_polarity(&mut self, polarity: IntPolarity) -> Result<(), Error<E>> {
         match polarity {
             IntPolarity::ActiveHigh => {
-                self.clear_register_bits(Register::CtrlReg6, INT_POLARITY).await
+                self.clear_register_bits(Register::CtrlReg6, INT_POLARITY)
+                    .await
             }
             IntPolarity::ActiveLow => {
-                self.set_register_bits(Register::CtrlReg6, INT_POLARITY).await
+                self.set_register_bits(Register::CtrlReg6, INT_POLARITY)
+                    .await
             }
         }
     }
 
     /// Enables the movement interrupt
-    async fn enable_movement_interrupt<T: IntRegisters>(&mut self, int: T, config: &MovementIntConfig) -> Result<(), Error<E>> {
+    async fn enable_movement_interrupt<T: IntRegisters>(
+        &mut self,
+        int: T,
+        config: &MovementIntConfig,
+    ) -> Result<(), Error<E>> {
         if config.threshold >= 0x80 || config.duration >= 0x80 {
             return Err(Error::InvalidParameter);
         }
-        
+
         let mut cfg = config.mode as u8;
         cfg |= (config.enable.z_high as u8) << 5;
         cfg |= (config.enable.z_low as u8) << 4;
@@ -300,15 +307,19 @@ where
         cfg |= config.enable.x_low as u8;
 
         if config.latch {
-            self.set_register_bits(Register::CtrlReg5, T::LIR_BIT).await?;
+            self.set_register_bits(Register::CtrlReg5, T::LIR_BIT)
+                .await?;
         } else {
-            self.clear_register_bits(Register::CtrlReg5, T::LIR_BIT).await?;
+            self.clear_register_bits(Register::CtrlReg5, T::LIR_BIT)
+                .await?;
         }
 
         if config.only_4d {
-            self.set_register_bits(Register::CtrlReg5, T::D4D_BIT).await?;
+            self.set_register_bits(Register::CtrlReg5, T::D4D_BIT)
+                .await?;
         } else {
-            self.clear_register_bits(Register::CtrlReg5, T::D4D_BIT).await?;
+            self.clear_register_bits(Register::CtrlReg5, T::D4D_BIT)
+                .await?;
         }
 
         self.write_register(int.cfg(), cfg).await?;
@@ -319,7 +330,10 @@ where
     }
 
     /// Reads the source of the movement interrupt
-    pub async fn read_movement_interrupt_source(&mut self, int: impl IntRegisters) -> Result<MovementInterrupts, Error<E>> {
+    pub async fn read_movement_interrupt_source(
+        &mut self,
+        int: impl IntRegisters,
+    ) -> Result<MovementInterrupts, Error<E>> {
         let src = self.read_register(int.src()).await?;
 
         Ok(MovementInterrupts {
@@ -337,7 +351,7 @@ where
         if config.threshold >= 0x80 || config.time_limit >= 0x80 {
             return Err(Error::InvalidParameter);
         }
-        
+
         let mut cfg = 0;
         cfg |= (config.enable.z_double as u8) << 5;
         cfg |= (config.enable.z_single as u8) << 4;
@@ -351,9 +365,12 @@ where
 
         self.write_register(Register::ClickCfg, cfg).await?;
         self.write_register(Register::ClickThs, ths).await?;
-        self.write_register(Register::TimeLimit, config.time_limit).await?;
-        self.write_register(Register::TimeLatency, config.time_latency).await?;
-        self.write_register(Register::TimeWindow, config.time_window).await?;
+        self.write_register(Register::TimeLimit, config.time_limit)
+            .await?;
+        self.write_register(Register::TimeLatency, config.time_latency)
+            .await?;
+        self.write_register(Register::TimeWindow, config.time_window)
+            .await?;
 
         Ok(())
     }
@@ -372,22 +389,27 @@ where
         })
     }
 
-    async fn enable_activity_interrupt(&mut self, config: &ActivityIntConfig) -> Result<(), Error<E>> {
+    async fn enable_activity_interrupt(
+        &mut self,
+        config: &ActivityIntConfig,
+    ) -> Result<(), Error<E>> {
         if config.threshold >= 0x80 {
             return Err(Error::InvalidParameter);
         }
 
-        self.write_register(Register::ActThs, config.threshold).await?;
+        self.write_register(Register::ActThs, config.threshold)
+            .await?;
         self.write_register(Register::ActDur, config.duration).await
     }
 
     /// Enables the internal temperature sensor
-    /// 
+    ///
     /// Note that enabling the temperature sensor disables continuous updates
     /// of the output registers
     pub async fn enable_temperature_sensor(&mut self, enable: bool) -> Result<(), Error<E>> {
         if enable {
-            self.write_register(Register::TempCfgReg, TEMP_EN_MASK).await?;
+            self.write_register(Register::TempCfgReg, TEMP_EN_MASK)
+                .await?;
             self.set_register_bits(Register::CtrlReg4, BDU).await?;
         } else {
             self.write_register(Register::TempCfgReg, 0x00).await?;
@@ -400,10 +422,16 @@ where
     pub async fn read_temperature(&mut self) -> Result<u16, Error<E>> {
         // Set MSB to enable auto-incrementing the read address
         let reg_addr = Register::OutTempL as u8 | 0x80;
-        self.i2c.write(self.addr, &[reg_addr]).await.map_err(Error::I2c)?;
+        self.i2c
+            .write(self.addr, &[reg_addr])
+            .await
+            .map_err(Error::I2c)?;
 
         let mut buffer = [0; 2];
-        self.i2c.read(self.addr, &mut buffer).await.map_err(Error::I2c)?;
+        self.i2c
+            .read(self.addr, &mut buffer)
+            .await
+            .map_err(Error::I2c)?;
         Ok(u16::from_le_bytes([buffer[0], buffer[1]]))
     }
 
@@ -413,14 +441,20 @@ where
             return Err(Error::WriteToReadOnly);
         }
 
-        self.i2c.write(self.addr, &[register.addr(), value]).await.map_err(Error::I2c)?;
+        self.i2c
+            .write(self.addr, &[register.addr(), value])
+            .await
+            .map_err(Error::I2c)?;
         Ok(())
     }
 
     /// Reads a value from a given register
     async fn read_register(&mut self, register: Register) -> Result<u8, Error<E>> {
         let mut buffer = [0u8; 1];
-        self.i2c.write_read(self.addr, &[register.addr()], &mut buffer).await.map_err(Error::I2c)?;
+        self.i2c
+            .write_read(self.addr, &[register.addr()], &mut buffer)
+            .await
+            .map_err(Error::I2c)?;
         Ok(buffer[0])
     }
 
@@ -545,23 +579,23 @@ pub enum IntPin {
 #[derive(Copy, Clone, Debug)]
 pub enum FifoConfig {
     /// Bypass mode
-    /// 
+    ///
     /// FIFO remains non-operational and for this reason it
     /// remains empty
     Bypass,
     /// FIFO mode
-    /// 
+    ///
     /// Buffer continues filling data from the accelerometer channels
     /// until it is full (a set of 32 samples stored). When the FIFO
     /// is full, it stops collecting data from the input channels and
     /// the FIFO contents remain unchanged
     Fifo,
     /// Stream mode
-    /// 
+    ///
     /// The FIFO continues filling data from the X, Y, and Z accelerometer channels
     /// until the buffer is full (a set of 32 samples stored) at which point
     /// the FIFO buffer index restarts from the beginning and older data is replaced
-    /// by the current data. The oldest values continue to be overwritten until a 
+    /// by the current data. The oldest values continue to be overwritten until a
     /// read operation frees the FIFO slots
     Stream {
         /// Watermark level for the watermark interrupt
@@ -569,7 +603,7 @@ pub enum FifoConfig {
         watermark: u8,
     },
     /// Stream-to-FIFO mode
-    /// 
+    ///
     /// Data from the X, Y and Z accelerometer channels are collected in a combination
     /// of Stream mode and FIFO mode. The FIFO buffer starts operating in Stream
     /// mode and switches to FIFO mode when the selected interrupt occurs
@@ -606,7 +640,7 @@ pub enum MovementIntMode {
     /// AND combination of interrupt events
     AndCombination = 0x80,
     /// 6-direction position recognition
-    /// 
+    ///
     /// An interrupt is generated when the orientation is inside a known zone
     /// The interrupt signal remains while the orientation is inside the zone
     PositionRecognition = 0xC0,
