@@ -1,0 +1,16 @@
+[package]
+name = "lis2dh"
+version = "0.1.0"
+edition = "2024"
+description = "Driver crate for ST LIS2DH12 accelerometer"
+repository = "https://github.com/andresovela/lis2dh-rs"
+documentation = "https://docs.rs/lis2dh"
+readme = "README.md"
+license = "MIT"
+keywords = ["accelerometer", "driver", "i2c"]
+categories = ["embedded", "no-std", "drivers", "asynchronous"]
+exclude = [".github"]
+
+[dependencies]
+embedded-hal = "1.0.0"
+embedded-hal-async = "1.0.0"
