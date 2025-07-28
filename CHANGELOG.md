@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.3.0] - 2025-07-28
 ### Changed
 - Automatically enable FIFO when calling `configure_fifo`
 - Made register access functions `pub`
