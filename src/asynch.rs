@@ -387,7 +387,7 @@ where
     }
 
     /// Writes a value to a given register
-    async fn write_register(&mut self, register: Register, value: u8) -> Result<(), Error<E>> {
+    pub async fn write_register(&mut self, register: Register, value: u8) -> Result<(), Error<E>> {
         if register.is_read_only() {
             return Err(Error::WriteToReadOnly);
         }
@@ -400,7 +400,7 @@ where
     }
 
     /// Reads a value from a given register
-    async fn read_register(&mut self, register: Register) -> Result<u8, Error<E>> {
+    pub async fn read_register(&mut self, register: Register) -> Result<u8, Error<E>> {
         let mut buffer = [0u8; 1];
         self.i2c
             .write_read(self.addr, &[register.addr()], &mut buffer)
@@ -410,7 +410,7 @@ where
     }
 
     /// Modifies the value of a given register
-    async fn modify_register<F>(&mut self, register: Register, f: F) -> Result<(), Error<E>>
+    pub async fn modify_register<F>(&mut self, register: Register, f: F) -> Result<(), Error<E>>
     where
         F: FnOnce(u8) -> u8,
     {
@@ -419,12 +419,20 @@ where
     }
 
     /// Sets some bits of a given register
-    async fn set_register_bits(&mut self, register: Register, bits: u8) -> Result<(), Error<E>> {
+    pub async fn set_register_bits(
+        &mut self,
+        register: Register,
+        bits: u8,
+    ) -> Result<(), Error<E>> {
         self.modify_register(register, |v| v | bits).await
     }
 
     /// Clears some bits of a given register
-    async fn clear_register_bits(&mut self, register: Register, bits: u8) -> Result<(), Error<E>> {
+    pub async fn clear_register_bits(
+        &mut self,
+        register: Register,
+        bits: u8,
+    ) -> Result<(), Error<E>> {
         self.modify_register(register, |v| v & !bits).await
     }
 }
