@@ -95,7 +95,7 @@ where
         }
     }
 
-    /// Configures the accelerometer's FIFO
+    /// Configures and enables the accelerometer's FIFO
     pub fn configure_fifo(&mut self, config: FifoConfig) -> Result<(), Error<E>> {
         let value = match config {
             FifoConfig::Bypass => 0x00,
@@ -108,10 +108,11 @@ where
                 if watermark >= 0x20 {
                     return Err(Error::InvalidParameter);
                 }
-                0x80 + watermark
+                0x80 | watermark
             }
         };
-        self.write_register(Register::FifoCtrlReg, value)
+        self.write_register(Register::FifoCtrlReg, value)?;
+        self.enable_fifo(true)
     }
 
     /// Reads the status of the FIFO
