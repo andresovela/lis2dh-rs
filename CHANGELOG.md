@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+### Changed
+- Automatically enable FIFO when calling `configure_fifo`
 
 ## [0.2.0] - 2025-07-26
 ### Added

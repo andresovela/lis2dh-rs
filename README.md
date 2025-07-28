@@ -7,15 +7,10 @@ Compatible with [embedded-hal] and [embedded-hal-async] traits.
 
 ```rust
 let mut accelerometer = Lis2dh::new(i2c, Sa0Pad::High);
-
 accelerometer.set_mode(Mode::Normal).await.unwrap();
 accelerometer.set_output_data_rate(OutputDataRate::Hz100).await.unwrap();
-
-let int1_config = Int1Config::FifoWatermark;
-accelerometer.configure_int1(&int1_config).await.unwrap();
-
+accelerometer.configure_int1(&Int1Config::FifoWatermark).await.unwrap();
 accelerometer.configure_fifo(FifoConfig::Stream { watermark: 9 }).await.unwrap();
-accelerometer.enable_fifo(true).await.unwrap();
 
 let mut data = [AccelerationData::default(); 10];
 loop {
