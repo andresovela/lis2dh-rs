@@ -121,6 +121,58 @@ pub struct Status {
     pub temp_data_available: bool,
 }
 
+/// High-pass filter mode
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[repr(u8)]
+pub enum HighPassFilterMode {
+    /// Normal mode (reset by reading REFERENCE register)
+    NormalModeWithReset = 0x00,
+    /// Reference signal for filtering
+    ReferenceSignal = 0x40,
+    /// Normal mode
+    NormalMode = 0x80,
+    /// Auto-reset on interrupt event
+    AutoResetOnInterrupt = 0xC0,
+}
+
+/// High-pass filter cut-off frequency selection
+///
+/// See application note AN5005 table 11f for details.
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[allow(missing_docs)]
+#[repr(u8)]
+pub enum HighPassCutoffFrequencySelection {
+    Cfg0 = 0x00,
+    Cfg1 = 0x10,
+    Cfg2 = 0x20,
+    Cfg3 = 0x30,
+}
+
+/// Filtered data selection
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[repr(u8)]
+pub enum HighPassFilterDataSelection {
+    /// Internal filter bypassed
+    Bypassed = 0x00,
+    /// Data from internal filter sent to output register and FIFO
+    SendDataFromFilter = 0x08,
+}
+
+/// High-pass filter configuration
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct HighPassFilterConfig {
+    /// High-pass filter mode
+    pub mode: HighPassFilterMode,
+    /// High-pass filter cut-off frequency selection
+    pub cutoff_frequency: HighPassCutoffFrequencySelection,
+    /// Filtered data selection
+    pub data_selection: HighPassFilterDataSelection,
+}
+
 /// Interrupt pin
 #[derive(Copy, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
@@ -240,6 +292,8 @@ pub struct MovementIntConfig {
     pub latch: bool,
     /// Enable 4D-detection: Disables the Z-axis
     pub only_4d: bool,
+    /// Enable high-pass filter
+    pub high_pass_filter: bool,
 }
 
 /// Click interrupts
@@ -277,6 +331,8 @@ pub struct ClickIntConfig {
     /// Latch interrupt request
     /// Cleared by reading click interrupt source
     pub latch: bool,
+    /// Enable high-pass filter
+    pub high_pass_filter: bool,
 }
 
 /// Click interrupt source

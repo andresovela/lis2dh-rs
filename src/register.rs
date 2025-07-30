@@ -85,6 +85,11 @@ pub(crate) const TEMP_EN_MASK: u8 = 0xC0;
 pub(crate) const ODR_MASK: u8 = 0xF0;
 pub(crate) const LPEN: u8 = 0x08;
 
+// CTRL_REG_2
+pub(crate) const HPCLICK: u8 = 0x04;
+pub(crate) const HP_IA2: u8 = 0x02;
+pub(crate) const HP_IA1: u8 = 0x01;
+
 // CTRL_REG_4
 pub(crate) const BDU: u8 = 0x80;
 pub(crate) const FS_MASK: u8 = 0x30;
@@ -153,6 +158,8 @@ pub trait IntRegisters {
     const LIR_BIT: u8;
     /// D4D bit position in register CTRL_REG_5
     const D4D_BIT: u8;
+    /// HP_IA bit position in register CTRL_REG_2
+    const HP_IA_BIT: u8;
     /// Get the CFG register for the INT block
     fn cfg(&self) -> Register;
     /// Get the SRC register for the INT block
@@ -172,10 +179,11 @@ pub struct Int1;
 pub struct Int2;
 
 macro_rules! impl_int_registers {
-    ($IntType:ident: $Cfg:ident, $Src:ident, $Ths:ident, $Dur:ident, $Lir:expr, $D4d:expr) => {
+    ($IntType:ident: $Cfg:ident, $Src:ident, $Ths:ident, $Dur:ident, $Lir:expr, $D4d:expr, $Hpia:expr) => {
         impl IntRegisters for $IntType {
             const LIR_BIT: u8 = $Lir;
             const D4D_BIT: u8 = $D4d;
+            const HP_IA_BIT: u8 = $Hpia;
             fn cfg(&self) -> Register {
                 Register::$Cfg
             }
@@ -192,5 +200,5 @@ macro_rules! impl_int_registers {
     };
 }
 
-impl_int_registers!(Int1: Int1Cfg, Int1Src, Int1Ths, Int1Duration, LIR_INT1, D4D_INT1);
-impl_int_registers!(Int2: Int2Cfg, Int2Src, Int2Ths, Int2Duration, LIR_INT2, D4D_INT2);
+impl_int_registers!(Int1: Int1Cfg, Int1Src, Int1Ths, Int1Duration, LIR_INT1, D4D_INT1, HP_IA1);
+impl_int_registers!(Int2: Int2Cfg, Int2Src, Int2Ths, Int2Duration, LIR_INT2, D4D_INT2, HP_IA2);

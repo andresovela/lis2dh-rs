@@ -1,7 +1,13 @@
 # Changelog
-## [Unreleased]
+## [0.4.0]
 ### Added
 - `defmt` feature to derive `defmt::Format` on crate types
+- `high_pass_filter` option to `MovementIntConfig`
+- `high_pass_filter` option to `ClickIntConfig`
+- `configure_high_pass_filter` API
+
+### Changed
+- Reduced number of I2C transactions when configuring movement interrupts
 
 ### Removed
 - `Debug` implementations from most crate types except `Error`
