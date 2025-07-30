@@ -1,4 +1,10 @@
 # Changelog
+## [Unreleased]
+### Added
+- `defmt` feature to derive `defmt::Format` on crate types
+
+### Removed
+- `Debug` implementations from most crate types except `Error`
 
 ## [0.3.0] - 2025-07-28
 ### Changed
