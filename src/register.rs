@@ -1,7 +1,8 @@
 //! Register utilities.
 
 /// LIS2DH registers
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 #[allow(missing_docs)]
 pub enum Register {
@@ -163,9 +164,11 @@ pub trait IntRegisters {
 }
 
 /// Representation of INT1 registers
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct Int1;
 
 /// Representation of INT2 registers
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct Int2;
 
 macro_rules! impl_int_registers {

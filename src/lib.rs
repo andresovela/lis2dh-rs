@@ -18,6 +18,7 @@ pub struct Lis2dh<I2C> {
 
 /// Error type
 #[derive(Debug)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Error<I2cError> {
     /// I2C bus error
     I2c(I2cError),
@@ -28,7 +29,8 @@ pub enum Error<I2cError> {
 }
 
 /// SA0 pad connection on the board
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Sa0Pad {
     /// SA0 pad is connected to GND
     Low = 0,
@@ -37,7 +39,8 @@ pub enum Sa0Pad {
 }
 
 /// Operating mode
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Mode {
     /// Low power mode (8-bit data output)
     LowPower,
@@ -48,8 +51,9 @@ pub enum Mode {
 }
 
 /// Full scale selection
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 #[repr(u8)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum FullScale {
     /// ±2 g
     Fs2g = 0x00,
@@ -62,8 +66,9 @@ pub enum FullScale {
 }
 
 /// Output data rate
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 #[repr(u8)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum OutputDataRate {
     /// Power-down mode
     PowerDown = 0x00,
@@ -91,7 +96,8 @@ pub enum OutputDataRate {
 }
 
 /// Status data
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct Status {
     /// X-, Y- and Z-axis overrun
     pub xyz_overrun: bool,
@@ -116,7 +122,8 @@ pub struct Status {
 }
 
 /// Interrupt pin
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum IntPin {
     /// Pin INT1
     Int1,
@@ -125,7 +132,8 @@ pub enum IntPin {
 }
 
 /// FIFO configuration
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum FifoConfig {
     /// Bypass mode
     ///
@@ -163,7 +171,8 @@ pub enum FifoConfig {
 }
 
 /// FIFO status data
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct FifoStatus {
     /// FIFO content exceeds watermark level
     pub watermark_exceeded: bool,
@@ -176,7 +185,8 @@ pub struct FifoStatus {
 }
 
 /// Interrupt mode for movement interrupts
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub enum MovementIntMode {
     /// OR combination of interrupt events
@@ -196,7 +206,8 @@ pub enum MovementIntMode {
 }
 
 /// Movement interrupts
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Default)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct MovementInterrupts {
     /// X-axis acceleration higher than threshold value
     pub x_high: bool,
@@ -213,7 +224,8 @@ pub struct MovementInterrupts {
 }
 
 /// Movement interrupt configuration
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct MovementIntConfig {
     /// Movement interrupt mode
     pub mode: MovementIntMode,
@@ -231,7 +243,8 @@ pub struct MovementIntConfig {
 }
 
 /// Click interrupts
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Default)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct ClickInterrupts {
     /// Single click on X-axis
     pub x_single: bool,
@@ -248,7 +261,8 @@ pub struct ClickInterrupts {
 }
 
 /// Click interrupt configuration
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct ClickIntConfig {
     /// Interrupts to enable
     pub enable: ClickInterrupts,
@@ -266,7 +280,8 @@ pub struct ClickIntConfig {
 }
 
 /// Click interrupt source
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct ClickIntSrc {
     /// X-axis click detected
     pub x: bool,
@@ -283,7 +298,8 @@ pub struct ClickIntSrc {
 }
 
 /// Activity interrupt configuration
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct ActivityIntConfig {
     /// Sleep-to-wake, return-to-sleep activation threshold in low-power mode
     /// 1 LSb = 16 mg @ FS = 2 g
@@ -296,7 +312,8 @@ pub struct ActivityIntConfig {
 }
 
 /// INT1 configuration
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Int1Config {
     /// Interrupt pin unused
     Unused,
@@ -315,7 +332,8 @@ pub enum Int1Config {
 }
 
 /// INT2 configuration
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Int2Config {
     /// Interrupt pin unused
     Unused,
@@ -332,7 +350,8 @@ pub enum Int2Config {
 }
 
 /// Interrupt polarity
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum IntPolarity {
     /// Active high
     ActiveHigh,
@@ -341,7 +360,7 @@ pub enum IntPolarity {
 }
 
 /// Acceleration data
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Default)]
 pub struct AccelerationData {
     /// X-axis
     pub x: i16,
@@ -349,4 +368,11 @@ pub struct AccelerationData {
     pub y: i16,
     /// Z-axis
     pub z: i16,
+}
+
+#[cfg(feature = "defmt")]
+impl defmt::Format for AccelerationData {
+    fn format(&self, f: defmt::Formatter) {
+        defmt::write!(f, "({}, {}, {})", self.x, self.y, self.z)
+    }
 }
