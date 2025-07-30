@@ -86,6 +86,15 @@ where
         })
     }
 
+    /// Configures the high-pass filter
+    pub fn configure_high_pass_filter(
+        &mut self,
+        config: &HighPassFilterConfig,
+    ) -> Result<(), Error<E>> {
+        let cr2 = config.mode as u8 | config.cutoff_frequency as u8 | config.data_selection as u8;
+        self.set_register_bits(Register::CtrlReg2, cr2)
+    }
+
     /// Enables/disables the accelerometer's FIFO
     pub fn enable_fifo(&mut self, enable: bool) -> Result<(), Error<E>> {
         if enable {
@@ -229,6 +238,11 @@ where
         }
     }
 
+    /// Sets the reference value for interrupt generation
+    pub fn set_interrupt_reference(&mut self, value: u8) -> Result<(), Error<E>> {
+        self.write_register(Register::Reference, value)
+    }
+
     /// Enables the movement interrupt
     fn enable_movement_interrupt<T: IntRegisters>(
         &mut self,
@@ -247,16 +261,23 @@ where
         cfg |= (config.enable.x_high as u8) << 1;
         cfg |= config.enable.x_low as u8;
 
-        if config.latch {
-            self.set_register_bits(Register::CtrlReg5, T::LIR_BIT)?;
-        } else {
-            self.clear_register_bits(Register::CtrlReg5, T::LIR_BIT)?;
-        }
+        let cr5 = match (config.latch, config.only_4d) {
+            (false, false) => 0x00,
+            (true, false) => T::LIR_BIT,
+            (false, true) => T::D4D_BIT,
+            (true, true) => T::LIR_BIT | T::D4D_BIT,
+        };
 
-        if config.only_4d {
-            self.set_register_bits(Register::CtrlReg5, T::D4D_BIT)?;
+        self.modify_register(Register::CtrlReg5, |mut v| {
+            v &= !(T::LIR_BIT | T::D4D_BIT);
+            v |= cr5;
+            v
+        })?;
+
+        if config.high_pass_filter {
+            self.set_register_bits(Register::CtrlReg2, T::HP_IA_BIT)?;
         } else {
-            self.clear_register_bits(Register::CtrlReg5, T::D4D_BIT)?;
+            self.clear_register_bits(Register::CtrlReg2, T::HP_IA_BIT)?;
         }
 
         self.write_register(int.cfg(), cfg)?;
@@ -299,6 +320,12 @@ where
 
         let mut ths = config.threshold;
         ths |= (config.latch as u8) << 7;
+
+        if config.high_pass_filter {
+            self.set_register_bits(Register::CtrlReg2, HPCLICK)?;
+        } else {
+            self.clear_register_bits(Register::CtrlReg2, HPCLICK)?;
+        }
 
         self.write_register(Register::ClickCfg, cfg)?;
         self.write_register(Register::ClickThs, ths)?;
